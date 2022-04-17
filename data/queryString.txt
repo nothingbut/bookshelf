@@ -1,0 +1,1 @@
+select NovelID, NovelName, Author, BookImg, LB from book_novel
