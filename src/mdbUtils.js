@@ -11,7 +11,7 @@ function bookshelfMDB(file) {
     this.booksTable = 'book_novel';
     this.contentTable = 'book_NovelContent';
     this.categoryTable = 'dic_noveltype';
-    this.listBooksQuery = 'select NovelID, NovelName, Author, BookImg, LB from book_novel where NovelID <> \'000549\' and NovelID <> \'001317\'';
+    this.listBooksQuery = 'select NovelID, NovelName, Author, BookImg, LB from book_novel';
     this.queryFile = './temp/queryString.txt';
 
     this.parseOption = {

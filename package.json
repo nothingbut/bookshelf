@@ -22,7 +22,6 @@
   },
   "homepage": "https://github.com/nothingbut/bookshelf#readme",
   "dependencies": {
-    "concat-stream": "^2.0.0",
     "csv-parse": "^5.0.4"
   }
 }
