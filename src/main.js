@@ -1,5 +1,5 @@
 const mdbFile = './data/pim.mdb';
-var mdbUtils = require('../src/mdbUtils');
+var mdbUtils = require('./mdbUtils');
 var bookshelfMDB = mdbUtils(mdbFile);
 
 bookshelfMDB.listBooks(function (err, books) {
