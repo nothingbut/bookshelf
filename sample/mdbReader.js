@@ -14,6 +14,14 @@ bookshelfMDB.listCategory(function(err, cats) {
             else {
                 console.log(books[0]);
                 console.log(cats.get(books[0].LB));
+                bookshelfMDB.getBrief(books[0].NovelID, function(err, brief) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    else {
+                        console.log(brief);
+                    }
+                });
             }
         });
     }
