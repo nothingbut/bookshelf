@@ -104,5 +104,4 @@ dist
 .tern-port
 data/pim.mdb
 temp/queryString.txt
-package-lock.json
 .DS_Store
