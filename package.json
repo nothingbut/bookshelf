@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/nothingbut/bookshelf#readme",
   "dependencies": {
-    "csv-parse": "^5.0.4"
+    "csv-parse": "^5.0.4",
+    "epub-gen": "^0.1.0"
   }
 }
