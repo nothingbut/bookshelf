@@ -12,7 +12,7 @@ function bookshelfMDB(file) {
     this.booksTable = 'book_novel';
     this.contentTable = 'book_NovelContent';
     this.categoryTable = 'dic_noveltype';
-    this.listBooksQuery = 'select NovelID, NovelName, Author, BookImg, LB from book_novel where NovelID < \'000100\'';
+    this.listBooksQuery = 'select NovelID, NovelName, Author, BookImg, LB from book_novel';
     this.listCategoryQuery = 'select MC, TopDM, DM from dic_noveltype';
     this.getBriefQuery = 'select brief from book_novel where NovelID = ';
     this.fetchBookQuery = 'select Displayorder, id, Title, Volume, DownDate from book_NovelContent where NovelID = ';
@@ -37,12 +37,12 @@ bookshelfMDB.prototype.listBooks = function (cb) {
     cmd.on('exit', (code) =>{
         if (code !== 0) {
             cmd.stderr.on('data', (data) => {
-                cb(data);
+                return cb(data);
             });
         } else {
-            if (!out) return cb('no output')
+            if (!out) return 'no output';
             booklist = parse(out, this.parseOption);
-            cb(false, booklist);
+            return booklist;
         }
     }); 
 }
