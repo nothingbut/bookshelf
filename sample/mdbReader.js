@@ -1,14 +1,16 @@
-const root = '/Users/nothingbut/Books/';
+const root = '/Users/shichang/public/Books/';
+// const root = '/Users/nohtingbut/Books/';
 const mdbFile = root + 'pim.mdb';    
 var mdbUtils = require('../src/mdbUtils');
 var bookshelfMDB = mdbUtils(mdbFile);
 
-async function generateEpub(cats, curbook) {
+function generateEpub(cats, curbook) {
     bookshelfMDB.fetchBook(curbook.NovelID, function(err, chapters) {
         if (err) {
             console.log(err);
         }
         else {
+            console.log('fetchBook done for ' + curbook.NovelID);
             var volumes = [];
             var volTitle = '';
             for (idx in chapters) {
@@ -37,6 +39,8 @@ async function generateEpub(cats, curbook) {
                     console.log(err);
                 }
                 else {
+                    console.log('getBrief done for ' + curbook.NovelID);
+
                     curbook.brief = brief;
 
                     var bookBuilder = require('../src/bookUtils');
@@ -59,15 +63,13 @@ bookshelfMDB.listCategory(function(err, cats) {
         bookshelfMDB.listBooks(function (err, books) {
             if (err) {
                 console.log(err);
-            } 
+            }
             else {
                 for (idx in books) {
                     curbook = books[idx];
-                    if (idx != 100) continue;
+                    if (idx > 100) break;
                     console.log('Processing book ' + curbook.NovelID);
-                    generateEpub(cats, curbook).catch(err => {
-                        console.log(err);
-                    });
+                    generateEpub(cats, curbook);
                 }
             }
         });

@@ -17,6 +17,7 @@ function bookshelfMDB(file) {
     this.getBriefQuery = 'select brief from book_novel where NovelID = ';
     this.fetchBookQuery = 'select Displayorder, id, Title, Volume, DownDate from book_NovelContent where NovelID = ';
     this.queryFile = './temp/queryString';
+    this.resultFile = './temp/queryResult';
 
     this.parseOption = {
         delimiter: this.tableDelimiter,
@@ -31,7 +32,7 @@ bookshelfMDB.prototype.listBooks = function (cb) {
     require('fs').writeFileSync(this.queryFile, this.listBooksQuery);
 
     var cmd = spawn('mdb-sql', ['-F', '--no-pretty-print', '-d', '|', '-i', this.queryFile, this.mdbFile]);
-    
+
     let out = ''
     cmd.stdout.on('data', data => (out += data))
     cmd.on('exit', (code) =>{
@@ -40,28 +41,37 @@ bookshelfMDB.prototype.listBooks = function (cb) {
                 return cb(data);
             });
         } else {
-            if (!out) return 'no output';
+            if (!out) return 'no output on listBooks';
+
+            require('fs').rmSync(this.queryFile);
+
             booklist = parse(out, this.parseOption);
-            return booklist;
+            cb(false, booklist);
         }
     }); 
 }
 
 bookshelfMDB.prototype.getBrief = function (id, cb) {
     var self = this;
-    require('fs').writeFileSync(this.queryFile, this.getBriefQuery + '\'' + id + '\'');
+    var curQueryFile = this.queryFile + id;
+    require('fs').writeFileSync(curQueryFile, this.getBriefQuery + '\'' + id + '\'');
 
-    var cmd = spawn('mdb-sql', ['-H', '-F', '--no-pretty-print', '-d', '|', '-i', this.queryFile, this.mdbFile]);
+    var curResultFile = this.resultFile + id;
+    const fd = require('fs').openSync(curResultFile, 'w+');
+
+    var cmd = spawn('mdb-sql', ['-H', '-F', '--no-pretty-print', '-d', '|', '-i', curQueryFile, this.mdbFile], {stdio:[process.stdin, fd, fd]});
     
-    let out = ''
-    cmd.stdout.on('data', data => (out += data))
     cmd.on('exit', (code) =>{
         if (code !== 0) {
             cmd.stderr.on('data', (data) => {
                 cb(data);
             });
         } else {
-            if (!out) return cb('no output')
+            require('fs').rmSync(curQueryFile);
+            var out = require('fs').readFileSync(curResultFile);
+            require('fs').rmSync(curResultFile);
+            if (!out) return cb('no output on getBrief for ' + id);
+           
             cb(false, out);
         }
     });
@@ -81,7 +91,10 @@ bookshelfMDB.prototype.listCategory = function (cb) {
                 cb(data);
             });
         } else {
-            if (!out) return cb('no output')
+            if (!out) return cb('no output on listCategory');
+
+            require('fs').rmSync(this.queryFile);
+
             categoryList = parse(out, this.parseOption);
             let categoryMap = new Map();
             for (idx in categoryList) {
@@ -95,21 +108,26 @@ bookshelfMDB.prototype.listCategory = function (cb) {
 
 bookshelfMDB.prototype.fetchBook = function (id, cb) {
     var self = this;
-    require('fs').writeFileSync(this.queryFile, this.fetchBookQuery + '\'' + id + '\'');
+    var curQueryFile = this.queryFile + id;
+    require('fs').writeFileSync(curQueryFile, this.fetchBookQuery + '\'' + id + '\'');
 
-    var cmd = spawn('mdb-sql', ['-F', '--no-pretty-print', '-d', '|', '-i', this.queryFile, this.mdbFile]);
+    var curResultFile = this.resultFile + id;
+    const fd = require('fs').openSync(curResultFile, 'w+');
+
+    var cmd = spawn('mdb-sql', ['-F', '--no-pretty-print', '-d', '|', '-i', curQueryFile, this.mdbFile], {stdio:[process.stdin, fd, fd]});
     
-    let out = ''
-    cmd.stdout.on('data', data => (out += data))
     cmd.on('exit', (code) =>{
         if (code !== 0) {
             cmd.stderr.on('data', (data) => {
                 cb(data);
             });
         } else {
-            if (!out) return cb('no output')
+            require('fs').rmSync(curQueryFile);
+            var out = require('fs').readFileSync(curResultFile);
+            require('fs').rmSync(curResultFile);
+            if (!out) return cb('no output on fetchBook for ' + id);
+            
             chapterList = parse(out, this.parseOption);
-
             cb(false, chapterList.sort((a, b) => a.Displayorder - b.Displayorder));
         }
     });

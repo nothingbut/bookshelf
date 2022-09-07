@@ -27,20 +27,18 @@ class bookEntity {
             this.cleanUp(this.temp);
         }
         fs.mkdirSync(this.temp);
-        fs.copyFileSync(this.approot + 'temp/main.css', this.temp + '/main.css');
+        fs.copyFileSync(this.approot + 'templ/epubgen/main.css', this.temp + '/main.css');
     }
 
     buildCover() {
         var fs = require('fs');
         fs.copyFileSync(this.root + '/' + this.cover, this.temp + '/' + this.cover);
-        var coverContent = fs.readFileSync(this.approot + 'temp/cover.html', 'utf8');
+        var coverContent = fs.readFileSync(this.approot + 'templ/epubgen/cover.html', 'utf8');
         coverContent = coverContent.replaceAll('{title}', this.title).replaceAll('{author}', this.author).replaceAll('{cover}', this.cover).replaceAll('{brief}', this.brief);
         fs.writeFileSync(this.coverfile, coverContent);
     }
 
     async createEpub(target) {
-        const { EPUBCreator } = require('@eit6609/epub-creator');
-
         const spine = ['cover.html'];
         const toc = [[{ label: '封面', href: 'cover.html'}]];
 
@@ -83,6 +81,8 @@ class bookEntity {
             }
         };
         
+        const { EPUBCreator } = require('@eit6609/epub-creator');
+
         const creator = new EPUBCreator(options);
         await creator.create(target).then(data => {
             this.cleanUp(this.temp);
@@ -93,7 +93,7 @@ class bookEntity {
         var fs = require('fs');
         var filename = idx + '_' + volume.title + '.html'
         var volumefile = this.temp + '/' + filename;
-        var content = fs.readFileSync(this.approot + 'temp/volume.html', 'utf8');
+        var content = fs.readFileSync(this.approot + 'templ/epubgen/volume.html', 'utf8');
         content = content.replaceAll('{volume}', volume.title).replaceAll('{first}', volume.chapters[0].Title).replaceAll('{last}', volume.chapters[volume.chapters.length - 1].Title);
         fs.writeFileSync(volumefile, content);
         return filename;
@@ -106,7 +106,7 @@ class bookEntity {
         var fs = require('fs');
         var filename = chapter.id + '.html'
         var chptfile = this.temp + '/' + filename;
-        var content = fs.readFileSync(this.approot + 'temp/chapter.html', 'utf8');
+        var content = fs.readFileSync(this.approot + 'templ/epubgen/chapter.html', 'utf8');
         var material = fs.readFileSync(this.root + '/' + chapter.id + '.htm');
         var iconv = require('iconv-lite');
         material = iconv.decode(material, 'gbk');
