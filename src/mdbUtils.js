@@ -43,9 +43,10 @@ bookshelfMDB.prototype.listBooks = function (cb) {
         } else {
             if (!out) return 'no output on listBooks';
 
+            booklist = parse(out, this.parseOption);
+
             require('fs').rmSync(this.queryFile);
 
-            booklist = parse(out, this.parseOption);
             cb(false, booklist);
         }
     }); 
@@ -67,11 +68,12 @@ bookshelfMDB.prototype.getBrief = function (id, cb) {
                 cb(data);
             });
         } else {
-            require('fs').rmSync(curQueryFile);
             var out = require('fs').readFileSync(curResultFile);
-            require('fs').rmSync(curResultFile);
             if (!out) return cb('no output on getBrief for ' + id);
            
+            require('fs').rmSync(curQueryFile);
+            require('fs').rmSync(curResultFile);
+
             cb(false, out);
         }
     });
@@ -93,14 +95,15 @@ bookshelfMDB.prototype.listCategory = function (cb) {
         } else {
             if (!out) return cb('no output on listCategory');
 
-            require('fs').rmSync(this.queryFile);
-
             categoryList = parse(out, this.parseOption);
             let categoryMap = new Map();
             for (idx in categoryList) {
                 categoryList[idx].MC = categoryList[idx].MC.replaceAll('-', '');
                 categoryMap.set(categoryList[idx]['DM'], categoryList[idx]);
             }
+
+            require('fs').rmSync(this.queryFile);
+
             cb(false, categoryMap);
         }
     }); 
@@ -122,12 +125,14 @@ bookshelfMDB.prototype.fetchBook = function (id, cb) {
                 cb(data);
             });
         } else {
-            require('fs').rmSync(curQueryFile);
             var out = require('fs').readFileSync(curResultFile);
-            require('fs').rmSync(curResultFile);
             if (!out) return cb('no output on fetchBook for ' + id);
             
             chapterList = parse(out, this.parseOption);
+
+            require('fs').rmSync(curQueryFile);
+            require('fs').rmSync(curResultFile);
+
             cb(false, chapterList.sort((a, b) => a.Displayorder - b.Displayorder));
         }
     });
